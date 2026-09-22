@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TawteenShield — Emiratisation Compliance & Fine Simulator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root{
+    --bg: #F6F8F7;
+    --surface: #FFFFFF;
+    --surface-2: #EFF3F1;
+    --ink: #10231C;
+    --ink-soft: #4B5D56;
+    --border: #DDE5E1;
+    --emerald-900: #06332A;
+    --emerald-700: #0A5C46;
+    --emerald-600: #0E7A5C;
+    --emerald-500: #14956F;
+    --emerald-100: #DCEFE7;
+    --gold: #A9822E;
+    --gold-soft: #F1E7CF;
+    --amber: #B4740E;
+    --amber-soft: #FBEFD9;
+    --red: #B42318;
+    --red-soft: #FBE7E5;
+    --shadow: 0 1px 2px rgba(6,51,42,0.06), 0 8px 24px -12px rgba(6,51,42,0.18);
+  }
+  :root:not([data-theme="light"]) {
+    @media (prefers-color-scheme: dark) {
+      --bg: #0B1612;
+      --surface: #10201A;
+      --surface-2: #152A22;
+      --ink: #EAF3EF;
+      --ink-soft: #9FB6AC;
+      --border: #223C32;
+      --emerald-100: #163629;
+      --gold-soft: #2B240F;
+      --amber-soft: #2E2007;
+      --red-soft: #331311;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0B1612;
+    --surface: #10201A;
+    --surface-2: #152A22;
+    --ink: #EAF3EF;
+    --ink-soft: #9FB6AC;
+    --border: #223C32;
+    --emerald-100: #163629;
+    --gold-soft: #2B240F;
+    --amber-soft: #2E2007;
+    --red-soft: #331311;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+  }
+  html, body { height: 100%; }
+  body{
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', system-ui, sans-serif;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  html{ scroll-padding-top: env(safe-area-inset-top, 0px); }
+  .font-display{ font-family: 'Space Grotesk', 'Inter', sans-serif; }
+  .card{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+  }
+  .field-label{
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+    font-weight: 500;
+  }
+  input[type="number"], select{
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--ink);
+    border-radius: 9px;
+    padding: 0.55rem 0.7rem;
+    width: 100%;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+  }
+  input[type="number"]:focus, select:focus, button:focus-visible, input[type="range"]:focus-visible{
+    outline: 2px solid var(--emerald-500);
+    outline-offset: 2px;
+  }
+  input[type="range"]{
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--surface-2);
+  }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--emerald-600);
+    border: 3px solid var(--surface);
+    box-shadow: 0 0 0 1px var(--emerald-600);
+    cursor: pointer;
+    margin-top: -7px;
+  }
+  input[type="range"]::-moz-range-thumb{
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--emerald-600);
+    border: 3px solid var(--surface);
+    box-shadow: 0 0 0 1px var(--emerald-600);
+    cursor: pointer;
+  }
+  .toggle-btn{
+    flex: 1;
+    text-align: center;
+    padding: 0.6rem 0.5rem;
+    border-radius: 9px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    transition: background .15s, color .15s, border-color .15s;
+  }
+  .toggle-btn[aria-pressed="true"]{
+    background: var(--emerald-700);
+    color: #fff;
+    border-color: var(--emerald-700);
+  }
+  .badge{
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.85rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.01em;
+  }
+  .badge-dot{ width: 8px; height: 8px; border-radius: 50%; }
+  .badge-green{ background: var(--emerald-100); color: var(--emerald-700); }
+  .badge-green .badge-dot{ background: var(--emerald-600); }
+  .badge-amber{ background: var(--amber-soft); color: var(--amber); }
+  .badge-amber .badge-dot{ background: var(--amber); }
+  .badge-red{ background: var(--red-soft); color: var(--red); }
+  .badge-red .badge-dot{ background: var(--red); }
+  .tick{ stroke: var(--border); }
+  .divider{ border-top: 1px solid var(--border); }
+  .goldline{ color: var(--gold); }
+  ::selection{ background: var(--emerald-100); }
+  @media print{
+    body *{ visibility: hidden; }
+    #report, #report *{ visibility: visible; }
+    #report{ position: absolute; top: 0; left: 0; width: 100%; }
+    .no-print{ display: none !important; }
+  }
+</style>
+</head>
+<body class="min-h-screen">
+
+<div class="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+
+  <!-- Header -->
+  <header class="no-print flex items-start sm:items-center justify-between gap-4 flex-wrap mb-7">
+    <div class="flex items-center gap-3">
+      <div class="w-11 h-11 rounded-xl flex items-center justify-center shrink-0" style="background: var(--emerald-700);">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2 L21 6 V12 C21 17 17 20.5 12 22 C7 20.5 3 17 3 12 V6 Z" stroke="white" stroke-width="1.6" fill="none"/>
+          <path d="M8.5 12 L11 14.5 L16 9" stroke="var(--gold)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div>
+        <h1 class="font-display text-xl sm:text-2xl font-700 tracking-tight" style="font-weight:700;">TawteenShield</h1>
+        <p class="text-sm" style="color: var(--ink-soft);">Emiratisation compliance &amp; MOHRE fine exposure simulator</p>
+      </div>
+    </div>
+    <button id="exportBtn" class="px-4 py-2.5 rounded-lg font-semibold text-sm text-white shrink-0" style="background: var(--emerald-700);">
+      Print audit report
+    </button>
+  </header>
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+    <!-- LEFT: Setup -->
+    <section class="no-print lg:col-span-4 space-y-5">
+      <div class="card p-5">
+        <h2 class="font-display text-base font-700" style="font-weight:700;">Business setup</h2>
+        <p class="text-xs mb-4" style="color: var(--ink-soft);">Skilled roles = ISCO levels 1–3 (managers, engineers, technicians).</p>
+
+        <div class="space-y-4">
+          <div>
+            <label class="field-label mb-1 block">Company size category</label>
+            <div class="flex gap-2" role="group" aria-label="Company size">
+              <button type="button" class="toggle-btn" id="sizeSmallBtn" aria-pressed="false">Small · 20–49</button>
+              <button type="button" class="toggle-btn" id="sizeMedBtn" aria-pressed="true">Medium/Large · 50+</button>
+            </div>
+          </div>
+
+          <div>
+            <label class="field-label mb-1 block" for="totalSkilled">Total skilled workforce</label>
+            <input type="number" id="totalSkilled" min="1" value="120">
+          </div>
+
+          <div>
+            <label class="field-label mb-1 block" for="currentEmiratis">Current UAE National employees (skilled roles)</label>
+            <input type="number" id="currentEmiratis" min="0" value="9">
+          </div>
+
+          <div id="mediumTargetWrap">
+            <label class="field-label mb-1 block" for="targetPct">Required Emiratisation target (%)</label>
+            <input type="number" id="targetPct" min="0" max="100" step="0.5" value="10">
+          </div>
+
+          <div id="smallTargetWrap" class="hidden">
+            <label class="field-label mb-1 block" for="targetFixed">Minimum Emirati hires required</label>
+            <input type="number" id="targetFixed" min="0" value="1">
+          </div>
+
+          <div>
+            <label class="field-label mb-1 block" for="fineRate">MOHRE fine rate — AED per missing candidate / month</label>
+            <input type="number" id="fineRate" min="0" step="500" value="10000">
+          </div>
+        </div>
+      </div>
+
+      <div class="card p-4 text-xs leading-relaxed" style="color: var(--ink-soft);">
+        <p><span class="font-semibold" style="color: var(--ink);">How this works:</span> the required headcount of Emiratis is calculated from your target, then compared to your current count. The gap becomes the monthly fine exposure at the rate you set above.</p>
+        <p class="mt-2">Figures are editable placeholders for planning — always confirm current thresholds and fine schedules against the latest MOHRE circular before reporting externally.</p>
+      </div>
+    </section>
+
+    <!-- RIGHT: Status -->
+    <section class="lg:col-span-8 space-y-5">
+      <div class="card p-5 sm:p-6">
+        <div class="flex items-center justify-between gap-3 mb-5 flex-wrap">
+          <h2 class="font-display text-base font-700" style="font-weight:700;">Live compliance status</h2>
+          <span id="statusBadge" class="badge badge-green"><span class="badge-dot"></span><span id="statusText">Compliant</span></span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-5 gap-6 items-center">
+          <div class="sm:col-span-2 flex flex-col items-center">
+            <svg viewBox="0 0 220 130" class="w-full max-w-[240px]">
+              <path d="M 15 115 A 95 95 0 0 1 205 115" fill="none" stroke="var(--surface-2)" stroke-width="16" stroke-linecap="round"/>
+              <path id="gaugeArc" d="M 15 115 A 95 95 0 0 1 205 115" fill="none" stroke="var(--emerald-600)" stroke-width="16" stroke-linecap="round" stroke-dasharray="298" stroke-dashoffset="298"/>
+              <line id="targetTick" x1="110" y1="20" x2="110" y2="34" stroke="var(--gold)" stroke-width="3" stroke-linecap="round"/>
+              <text x="110" y="100" text-anchor="middle" class="font-display" font-size="30" font-weight="700" fill="var(--ink)"><tspan id="gaugeActualPct">0%</tspan></text>
+              <text x="110" y="118" text-anchor="middle" font-size="10" fill="var(--ink-soft)">actual Emiratisation</text>
+            </svg>
+            <p class="text-xs -mt-2" style="color: var(--ink-soft);">Gold mark = required target</p>
+          </div>
+
+          <div class="sm:col-span-3 grid grid-cols-2 gap-4">
+            <div class="rounded-xl p-4" style="background: var(--surface-2);">
+              <p class="text-xs" style="color: var(--ink-soft);">Emiratis on payroll</p>
+              <p class="font-display text-2xl font-700" id="statCurrent">0</p>
+            </div>
+            <div class="rounded-xl p-4" style="background: var(--surface-2);">
+              <p class="text-xs" style="color: var(--ink-soft);">Required headcount</p>
+              <p class="font-display text-2xl font-700" id="statRequired">0</p>
+            </div>
+            <div class="rounded-xl p-4" style="background: var(--surface-2);">
+              <p class="text-xs" style="color: var(--ink-soft);">Missing candidates</p>
+              <p class="font-display text-2xl font-700" id="statMissing">0</p>
+            </div>
+            <div class="rounded-xl p-4 sm:col-span-1" style="background: var(--red-soft);">
+              <p class="text-xs" style="color: var(--red);">Monthly fine exposure</p>
+              <p class="font-display text-2xl font-700" id="statFine" style="color: var(--red);">AED 0</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- What-if simulator -->
+      <div class="card p-5 sm:p-6">
+        <h2 class="font-display text-base font-700 mb-1" style="font-weight:700;">What-if hiring simulator</h2>
+        <p class="text-xs mb-5" style="color: var(--ink-soft);">Model next month's hiring plan and see what it takes to stay clear of penalties.</p>
+
+        <div class="space-y-6">
+          <div>
+            <div class="flex justify-between items-baseline mb-1.5">
+              <label class="field-label" for="hireForeign">Foreign workers hired next month</label>
+              <span class="font-display font-700 text-sm" id="hireForeignVal">0</span>
+            </div>
+            <input type="range" id="hireForeign" min="0" max="50" value="0">
+          </div>
+          <div>
+            <div class="flex justify-between items-baseline mb-1.5">
+              <label class="field-label" for="hireEmirati">Emiratis hired next month</label>
+              <span class="font-display font-700 text-sm" id="hireEmiratiVal">0</span>
+            </div>
+            <input type="range" id="hireEmirati" min="0" max="50" value="0">
+          </div>
+        </div>
+
+        <div class="divider mt-6 pt-5 grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <p class="text-xs" style="color: var(--ink-soft);">Projected workforce</p>
+            <p class="font-display text-xl font-700" id="simWorkforce">0</p>
+          </div>
+          <div>
+            <p class="text-xs" style="color: var(--ink-soft);">Emiratis still needed to stay compliant</p>
+            <p class="font-display text-xl font-700" id="simNeeded">0</p>
+          </div>
+          <div class="rounded-xl px-4 py-2.5 flex items-center justify-center" id="simStatusBox">
+            <span class="badge badge-green" id="simBadge"><span class="badge-dot"></span><span id="simBadgeText">Stays compliant</span></span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Printable report -->
+  <section id="report" class="card p-6 sm:p-8 mt-5">
+    <div class="flex items-start justify-between flex-wrap gap-3 mb-6">
+      <div>
+        <p class="text-xs uppercase tracking-wide" style="color: var(--ink-soft); letter-spacing:0.08em;">MOHRE Risk &amp; Fine Audit Report</p>
+        <h2 class="font-display text-xl font-700" style="font-weight:700;">Emiratisation Compliance Summary</h2>
+      </div>
+      <p class="text-xs text-right" style="color: var(--ink-soft);">Generated <span id="reportDate"></span><br>via TawteenShield</p>
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+      <div class="rounded-xl p-4" style="background: var(--surface-2);">
+        <p class="text-xs" style="color: var(--ink-soft);">Company category</p>
+        <p class="font-display text-lg font-700" id="rCategory">—</p>
+      </div>
+      <div class="rounded-xl p-4" style="background: var(--surface-2);">
+        <p class="text-xs" style="color: var(--ink-soft);">Skilled workforce</p>
+        <p class="font-display text-lg font-700" id="rWorkforce">—</p>
+      </div>
+      <div class="rounded-xl p-4" style="background: var(--surface-2);">
+        <p class="text-xs" style="color: var(--ink-soft);">Emiratis employed</p>
+        <p class="font-display text-lg font-700" id="rEmiratis">—</p>
+      </div>
+      <div class="rounded-xl p-4" style="background: var(--surface-2);">
+        <p class="text-xs" style="color: var(--ink-soft);">Actual Emiratisation</p>
+        <p class="font-display text-lg font-700" id="rActualPct">—</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+      <div class="rounded-xl p-4 border" style="border-color: var(--border);">
+        <p class="text-xs" style="color: var(--ink-soft);">Required headcount</p>
+        <p class="font-display text-xl font-700" id="rRequired">—</p>
+      </div>
+      <div class="rounded-xl p-4 border" style="border-color: var(--border);">
+        <p class="text-xs" style="color: var(--ink-soft);">Missing candidates</p>
+        <p class="font-display text-xl font-700" id="rMissing">—</p>
+      </div>
+      <div class="rounded-xl p-4 border" style="border-color: var(--red);">
+        <p class="text-xs" style="color: var(--red);">Monthly fine exposure</p>
+        <p class="font-display text-xl font-700" style="color: var(--red);" id="rFine">—</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3 mb-6">
+      <span class="text-sm font-semibold" style="color: var(--ink-soft);">Compliance status:</span>
+      <span class="badge" id="rBadge"><span class="badge-dot"></span><span id="rBadgeText">—</span></span>
+    </div>
+
+    <div class="divider pt-5 mb-5">
+      <p class="text-sm font-semibold mb-1.5">Recommended action</p>
+      <p class="text-sm leading-relaxed" style="color: var(--ink-soft);" id="rRecommendation">—</p>
+    </div>
+
+    <p class="text-[11px] leading-relaxed" style="color: var(--ink-soft);">This report is a planning estimate generated from figures entered by the preparer and does not constitute official MOHRE correspondence. Fine rates and Emiratisation targets should be verified against the current MOHRE circular before this document is relied upon for compliance or financial decisions.</p>
+  </section>
+
+  <footer class="no-print text-center text-xs mt-6 pb-2" style="color: var(--ink-soft);">
+    Data is stored only in this browser via local storage. Nothing is sent anywhere.
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  const $ = (id) => document.getElementById(id);
+  const STORAGE_KEY = "tawteenshield.v1";
+
+  const els = {
+    sizeSmallBtn: $("sizeSmallBtn"),
+    sizeMedBtn: $("sizeMedBtn"),
+    totalSkilled: $("totalSkilled"),
+    currentEmiratis: $("currentEmiratis"),
+    targetPct: $("targetPct"),
+    targetFixed: $("targetFixed"),
+    fineRate: $("fineRate"),
+    mediumTargetWrap: $("mediumTargetWrap"),
+    smallTargetWrap: $("smallTargetWrap"),
+    hireForeign: $("hireForeign"),
+    hireEmirati: $("hireEmirati"),
+  };
+
+  let state = {
+    sizeCategory: "medium", // "small" | "medium"
+    totalSkilled: 120,
+    currentEmiratis: 9,
+    targetPct: 10,
+    targetFixed: 1,
+    fineRate: 10000,
+    hireForeign: 0,
+    hireEmirati: 0,
+  };
+
+  function loadState(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        const saved = JSON.parse(raw);
+        state = Object.assign({}, state, saved);
+      }
+    }catch(e){ /* ignore corrupt storage */ }
+  }
+
+  function saveState(){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+    catch(e){ /* storage unavailable, continue silently */ }
+  }
+
+  function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+
+  function requiredHeadcount(workforce, category, targetPct, targetFixed){
+    if(category === "small"){
+      return Math.max(0, Math.round(targetFixed));
+    }
+    return Math.ceil((targetPct/100) * workforce);
+  }
+
+  function computeCore(){
+    const workforce = Math.max(0, Math.round(state.totalSkilled) || 0);
+    const current = Math.max(0, Math.round(state.currentEmiratis) || 0);
+    const required = requiredHeadcount(workforce, state.sizeCategory, state.targetPct, state.targetFixed);
+    const missing = Math.max(0, required - current);
+    const actualPct = workforce > 0 ? (current/workforce)*100 : 0;
+    const requiredPct = state.sizeCategory === "small"
+      ? (workforce > 0 ? (required/workforce)*100 : 0)
+      : state.targetPct;
+    const fine = missing * (Math.max(0, state.fineRate) || 0);
+
+    let status = "green";
+    if(missing > 0){ status = "red"; }
+    else if(current === required){ status = "amber"; } // sitting exactly at the line, zero buffer
+    return { workforce, current, required, missing, actualPct, requiredPct, fine, status };
+  }
+
+  function statusMeta(status){
+    if(status === "green") return { label: "Compliant", cls: "badge-green" };
+    if(status === "amber") return { label: "Within 1 hire of penalty", cls: "badge-amber" };
+    return { label: "Fined zone", cls: "badge-red" };
+  }
+
+  function setBadge(el, textEl, status){
+    const meta = statusMeta(status);
+    el.className = "badge " + meta.cls;
+    textEl.textContent = meta.label;
+  }
+
+  function fmtAED(n){
+    return "AED " + Math.round(n).toLocaleString("en-US");
+  }
+
+  function render(){
+    // sync inputs from state
+    els.totalSkilled.value = state.totalSkilled;
+    els.currentEmiratis.value = state.currentEmiratis;
+    els.targetPct.value = state.targetPct;
+    els.targetFixed.value = state.targetFixed;
+    els.fineRate.value = state.fineRate;
+    els.hireForeign.value = state.hireForeign;
+    els.hireEmirati.value = state.hireEmirati;
+    $("hireForeignVal").textContent = state.hireForeign;
+    $("hireEmiratiVal").textContent = state.hireEmirati;
+
+    const isSmall = state.sizeCategory === "small";
+    els.sizeSmallBtn.setAttribute("aria-pressed", String(isSmall));
+    els.sizeMedBtn.setAttribute("aria-pressed", String(!isSmall));
+    els.mediumTargetWrap.classList.toggle("hidden", isSmall);
+    els.smallTargetWrap.classList.toggle("hidden", !isSmall);
+    els.hireForeign.max = isSmall ? 20 : 100;
+    els.hireEmirati.max = isSmall ? 10 : 50;
+
+    const c = computeCore();
+
+    // gauge: arc length 298 (approx path length), map 0-100% to full sweep, cap visual at 100%
+    const pctForArc = clamp(c.actualPct, 0, 100);
+    const arcLen = 298;
+    const offset = arcLen - (pctForArc/100)*arcLen;
+    $("gaugeArc").setAttribute("stroke-dashoffset", String(offset));
+    $("gaugeArc").setAttribute("stroke", c.status === "red" ? "var(--red)" : c.status === "amber" ? "var(--amber)" : "var(--emerald-600)");
+    $("gaugeActualPct").textContent = c.actualPct.toFixed(1) + "%";
+
+    // target tick position along the semicircle (110,115) radius 95, from 180deg to 0deg
+    const reqPct = clamp(c.requiredPct, 0, 100);
+    const angle = Math.PI - (reqPct/100)*Math.PI; // radians, PI(left)->0(right)
+    const cx = 110, cy = 115, r1 = 92, r2 = 106;
+    const x1 = cx + r1*Math.cos(angle), y1 = cy - r1*Math.sin(angle);
+    const x2 = cx + r2*Math.cos(angle), y2 = cy - r2*Math.sin(angle);
+    const tick = $("targetTick");
+    tick.setAttribute("x1", x1.toFixed(1)); tick.setAttribute("y1", y1.toFixed(1));
+    tick.setAttribute("x2", x2.toFixed(1)); tick.setAttribute("y2", y2.toFixed(1));
+
+    $("statCurrent").textContent = c.current;
+    $("statRequired").textContent = c.required;
+    $("statMissing").textContent = c.missing;
+    $("statFine").textContent = fmtAED(c.fine);
+    setBadge($("statusBadge"), $("statusText"), c.status);
+
+    // simulator
+    const simWorkforce = c.workforce + (Number(state.hireForeign)||0) + (Number(state.hireEmirati)||0);
+    const simEmiratis = c.current + (Number(state.hireEmirati)||0);
+    const simRequired = requiredHeadcount(simWorkforce, state.sizeCategory, state.targetPct, state.targetFixed);
+    const simMissing = Math.max(0, simRequired - simEmiratis);
+    let simStatus = "green";
+    if(simMissing > 0) simStatus = "red";
+    else if(simEmiratis === simRequired) simStatus = "amber";
+
+    $("simWorkforce").textContent = simWorkforce;
+    $("simNeeded").textContent = simMissing;
+    const simMeta = statusMeta(simStatus);
+    const simLabel = simMissing > 0
+      ? ("Hire " + simMissing + " more Emirati" + (simMissing===1?"":"s") + " to avoid penalties")
+      : (simStatus === "amber" ? "Stays compliant, no buffer left" : "Stays compliant with buffer");
+    $("simBadge").className = "badge " + simMeta.cls;
+    $("simBadgeText").textContent = simLabel;
+
+    // report
+    $("reportDate").textContent = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" });
+    $("rCategory").textContent = isSmall ? "Small (20–49 employees)" : "Medium/Large (50+ employees)";
+    $("rWorkforce").textContent = c.workforce.toLocaleString("en-US");
+    $("rEmiratis").textContent = c.current.toLocaleString("en-US");
+    $("rActualPct").textContent = c.actualPct.toFixed(1) + "%";
+    $("rRequired").textContent = c.required.toLocaleString("en-US") + (isSmall ? " (fixed minimum)" : " (" + state.targetPct + "% target)");
+    $("rMissing").textContent = c.missing.toLocaleString("en-US");
+    $("rFine").textContent = fmtAED(c.fine) + " / month";
+    setBadge($("rBadge"), $("rBadgeText"), c.status);
+
+    let rec;
+    if(c.status === "green"){
+      rec = "Current Emirati headcount exceeds the required threshold. Maintain hiring pace and re-check this report monthly, especially before any planned reduction in Emirati staff or expansion of the skilled workforce.";
+    } else if(c.status === "amber"){
+      rec = "Emirati headcount meets the requirement exactly, with no buffer. A single additional foreign hire, or the departure of one Emirati employee, would trigger a monthly fine of " + fmtAED(state.fineRate) + " per missing candidate. Recruit at least one additional Emirati before expanding headcount.";
+    } else {
+      rec = "The company is short " + c.missing + " Emirati candidate" + (c.missing===1?"":"s") + " against the required threshold, exposing the business to an estimated " + fmtAED(c.fine) + " in fines per month. Prioritise recruitment of " + c.missing + " qualified UAE national" + (c.missing===1?"":"s") + " in skilled roles to close the gap.";
+    }
+    $("rRecommendation").textContent = rec;
+  }
+
+  function bindNumber(el, key, opts){
+    el.addEventListener("input", () => {
+      let v = parseFloat(el.value);
+      if(Number.isNaN(v)) v = 0;
+      if(opts && opts.min !== undefined) v = Math.max(opts.min, v);
+      if(opts && opts.max !== undefined) v = Math.min(opts.max, v);
+      state[key] = v;
+      saveState();
+      render();
+    });
+  }
+
+  bindNumber(els.totalSkilled, "totalSkilled", { min: 0 });
+  bindNumber(els.currentEmiratis, "currentEmiratis", { min: 0 });
+  bindNumber(els.targetPct, "targetPct", { min: 0, max: 100 });
+  bindNumber(els.targetFixed, "targetFixed", { min: 0 });
+  bindNumber(els.fineRate, "fineRate", { min: 0 });
+
+  els.hireForeign.addEventListener("input", () => {
+    state.hireForeign = Number(els.hireForeign.value);
+    saveState(); render();
+  });
+  els.hireEmirati.addEventListener("input", () => {
+    state.hireEmirati = Number(els.hireEmirati.value);
+    saveState(); render();
+  });
+
+  els.sizeSmallBtn.addEventListener("click", () => {
+    state.sizeCategory = "small";
+    saveState(); render();
+  });
+  els.sizeMedBtn.addEventListener("click", () => {
+    state.sizeCategory = "medium";
+    saveState(); render();
+  });
+
+  $("exportBtn").addEventListener("click", () => {
+    window.print();
+  });
+
+  loadState();
+  render();
+})();
+</script>
+</body>
+</html>
